@@ -1,9 +1,20 @@
-const { Asset } = require('parcel-bundler')
+const JSAsset = require('parcel-bundler/src/assets/JSAsset');
+const generate = require('babel-generator').default
+const babylon = require('babylon')
 
-class MustacheAssets extends Asset {
-    async parse(code) {
-        return await super.parse(this.contents)
-    }
+class MustacheAssets extends JSAsset {
+  async load() {
+    let content = await super.load()
+    content = '\`' + content + '\`';
+    content = babylon.parse(content);
+    content = generate(content).code
+    return 'module.exports = ' + content + ';';
+  }
+
+  parse() {}
+  collectDependencies() {}
+  pretransform() {}
+  transform() {}
 }
 
-module.exports = MustacheAssets
+module.exports = MustacheAssets;
